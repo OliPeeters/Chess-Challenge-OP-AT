@@ -1,24 +1,23 @@
-﻿using ChessChallenge.API;
+using ChessChallenge.API;
 using System;
 
 //no minmax
-//both colours
+//only white
 //checkmates
 //checks
 //little endgame
 //promotions
 
-//IMPROVEMENTS
-//both colours
-public class EvilBot : IChessBot
+public class version1 : IChessBot
 {
     public Move Think(Board board, Timer timer)
     {
         Move[] legalMoves = board.GetLegalMoves();
-
         Move bestMove = legalMoves[0];
 
-        bool colour = board.IsWhiteToMove;
+        ulong oldBoard = board.AllPiecesBitboard;
+        ulong allyBoard = board.WhitePiecesBitboard;
+        ulong enemyBoard = board.BlackPiecesBitboard;
         // ATTEMPTED FLIP
         //if (!board.IsWhiteToMove)
         //{
@@ -33,10 +32,9 @@ public class EvilBot : IChessBot
         {
             board.MakeMove(currentMove);
 
-            ulong flip = 0x1111111111111111;
-            if(colour) flip = 0x0000000000000000;
-            ulong allyBoard = board.WhitePiecesBitboard ^ flip;
-            ulong enemyBoard = board.BlackPiecesBitboard ^ flip;
+            ulong tempBoard = allyBoard;
+            BitboardHelper.ToggleSquare(ref tempBoard, currentMove.StartSquare);
+            BitboardHelper.ToggleSquare(ref tempBoard, currentMove.TargetSquare);
 
             int currentWeight = 0;
 
@@ -59,12 +57,13 @@ public class EvilBot : IChessBot
             //Adds number of our pieces which are in the center of the board
             //cols b-g
             //rows 2-5
-            currentWeight += BitboardHelper.GetNumberOfSetBits(allyBoard & 0x7e7e7e7e0000);
+            currentWeight += BitboardHelper.GetNumberOfSetBits(tempBoard & 0x7e7e7e0000);
 
             //Increases weight if pawn is further up the board in the endgame
-            int pieceDepth = 7 - currentMove.TargetSquare.Rank;
-            if(colour) pieceDepth = currentMove.TargetSquare.Rank;
-            if(BitboardHelper.GetNumberOfSetBits(enemyBoard) > 7) if((int) currentMove.MovePieceType == 1) currentWeight += 50 * pieceDepth;
+            if(BitboardHelper.GetNumberOfSetBits(enemyBoard) > 7)
+            {
+                if((int) currentMove.MovePieceType == 1) currentWeight += 50 * currentMove.TargetSquare.Rank;
+            }
 
             //Increases weight if a pawn can be promoted to a queen
             if((int)currentMove.PromotionPieceType == 5) currentWeight += 500;

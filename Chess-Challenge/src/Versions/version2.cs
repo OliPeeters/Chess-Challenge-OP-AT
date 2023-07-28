@@ -1,4 +1,4 @@
-﻿using ChessChallenge.API;
+using ChessChallenge.API;
 using System;
 
 //no minmax
@@ -10,7 +10,7 @@ using System;
 
 //IMPROVEMENTS
 //both colours
-public class EvilBot : IChessBot
+public class version2 : IChessBot
 {
     public Move Think(Board board, Timer timer)
     {

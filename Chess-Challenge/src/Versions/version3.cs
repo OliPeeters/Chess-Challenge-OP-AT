@@ -1,11 +1,11 @@
-﻿using ChessChallenge.API;
+using ChessChallenge.API;
 using System;
 
 //TO-ADD
 
 
 
-public class MyBot : IChessBot
+public class version3 : IChessBot
 {
     public Move Think(Board board, Timer timer)
     {
