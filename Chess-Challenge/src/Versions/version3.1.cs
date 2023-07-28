@@ -27,7 +27,7 @@ public class version3 : IChessBot
         {
             board.MakeMove(currentMove);
             //Second argument is maxDepth
-            int localMax = minimax(board, 1, currentMove);
+            int localMax = minimax(board, 2, currentMove);
             board.UndoMove(currentMove);
 
             if(localMax > bestScore)
