@@ -1,4 +1,4 @@
-﻿using ChessChallenge.API;
+using ChessChallenge.API;
 using System;
 
 //no minmax
@@ -10,7 +10,7 @@ using System;
 
 //IMPROVEMENTS
 //MinMax lol
-public class MyBot : IChessBot
+public class version3_3 : IChessBot
 {
     public Move Think(Board board, Timer timer)
     {
@@ -96,9 +96,6 @@ public class MyBot : IChessBot
         //in play for both sides
         //More ally pieces == Higher value
         //More enemy pieces == Lower value
-
-        //RAMP THIS UP
-        //Currently poor trades being made
         int[] pieceValue = {10,30,30,50,90,00};
         int counter = 0;
         foreach (PieceList pieceList in board.GetAllPieceLists())
@@ -123,8 +120,7 @@ public class MyBot : IChessBot
         //True flag means only moves involving a capture
         foreach (Move enemyCapture in board.GetLegalMoves(true))
         {
-            //if((int)enemyCapture.CapturePieceType > 1) boardWeight -=  50 * (int)enemyCapture.CapturePieceType;
-            boardWeight -= pieceValue[(int)enemyCapture.CapturePieceType];
+            if((int)enemyCapture.CapturePieceType > 1) boardWeight -=  50 * (int)enemyCapture.CapturePieceType;
         }
 
         //Weight moves which put the opponent in check

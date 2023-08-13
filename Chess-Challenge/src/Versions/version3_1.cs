@@ -5,7 +5,7 @@ using System;
 
 
 
-public class version3 : IChessBot
+public class version3_1 : IChessBot
 {
     public Move Think(Board board, Timer timer)
     {

@@ -1,4 +1,4 @@
-﻿using ChessChallenge.API;
+using ChessChallenge.API;
 using System;
 
 //no minmax
@@ -10,7 +10,7 @@ using System;
 
 //IMPROVEMENTS
 //MinMax lol
-public class MyBot : IChessBot
+public class version3_2 : IChessBot
 {
     public Move Think(Board board, Timer timer)
     {
@@ -96,10 +96,7 @@ public class MyBot : IChessBot
         //in play for both sides
         //More ally pieces == Higher value
         //More enemy pieces == Lower value
-
-        //RAMP THIS UP
-        //Currently poor trades being made
-        int[] pieceValue = {10,30,30,50,90,00};
+        int[] pieceValue = {1,3,3,5,9,0};
         int counter = 0;
         foreach (PieceList pieceList in board.GetAllPieceLists())
         {
@@ -123,12 +120,11 @@ public class MyBot : IChessBot
         //True flag means only moves involving a capture
         foreach (Move enemyCapture in board.GetLegalMoves(true))
         {
-            //if((int)enemyCapture.CapturePieceType > 1) boardWeight -=  50 * (int)enemyCapture.CapturePieceType;
-            boardWeight -= pieceValue[(int)enemyCapture.CapturePieceType];
+            if((int)enemyCapture.CapturePieceType > 1) boardWeight -=  50 * (int)enemyCapture.CapturePieceType;
         }
 
         //Weight moves which put the opponent in check
-        if(board.IsInCheck()) boardWeight += 30;
+        if(board.IsInCheck()) boardWeight += 50;
 
         //Always make move if it is a checkmate
         if(board.IsInCheckmate()) return 0x11111111;
@@ -142,64 +138,46 @@ public class MyBot : IChessBot
         //Calculates weights of positioning of pieces on the board
         int bbScore = 0;
         //Pawn
-        ulong tempBitboard = board.GetPieceBitboard((PieceType)1, true);
-        bbScore += BitboardHelper.GetNumberOfSetBits(tempBitboard ^ 0xff180000000000) * 40;
-        bbScore += BitboardHelper.GetNumberOfSetBits(tempBitboard ^ 0x241818000000 ) * 20;
-        bbScore += BitboardHelper.GetNumberOfSetBits(tempBitboard ^ 0xc36600006600 ) * 10;
-        bbScore += BitboardHelper.GetNumberOfSetBits(tempBitboard ^ 0x661800 ) * -10;
+        bbScore += BitboardHelper.GetNumberOfSetBits(board.GetPieceBitboard((PieceType)1, true) ^ 0xff180000000000) * 40;
+        bbScore += BitboardHelper.GetNumberOfSetBits(board.GetPieceBitboard((PieceType)1, true) ^ 0x241818000000 ) * 20;
+        bbScore += BitboardHelper.GetNumberOfSetBits(board.GetPieceBitboard((PieceType)1, true) ^ 0xc36600006600 ) * 10;
+        bbScore += BitboardHelper.GetNumberOfSetBits(board.GetPieceBitboard((PieceType)1, true) ^ 0x661800 ) * -10;
         //Knight
-        tempBitboard = board.GetPieceBitboard((PieceType)2, true);
-        bbScore += BitboardHelper.GetNumberOfSetBits(tempBitboard ^ 0xc3810000000081c3 ) * -40;
-        bbScore += BitboardHelper.GetNumberOfSetBits(tempBitboard ^ 0x3c4281818181423c ) * -20;
-        bbScore += BitboardHelper.GetNumberOfSetBits(tempBitboard ^ 0x244200661800 ) * 10;
-        bbScore += BitboardHelper.GetNumberOfSetBits(tempBitboard ^ 0x183c3c180000 ) * 20;
+        bbScore += BitboardHelper.GetNumberOfSetBits(board.GetPieceBitboard((PieceType)2, true) ^ 0xc3810000000081c3 ) * -40;
+        bbScore += BitboardHelper.GetNumberOfSetBits(board.GetPieceBitboard((PieceType)2, true) ^ 0x3c4281818181423c ) * -20;
+        bbScore += BitboardHelper.GetNumberOfSetBits(board.GetPieceBitboard((PieceType)2, true) ^ 0x244200661800 ) * 10;
+        bbScore += BitboardHelper.GetNumberOfSetBits(board.GetPieceBitboard((PieceType)2, true) ^ 0x183c3c180000 ) * 20;
         //Bishop
-        tempBitboard = board.GetPieceBitboard((PieceType)3, true);
-        bbScore += BitboardHelper.GetNumberOfSetBits(tempBitboard ^ 0xff818181818181ff ) * -10;
-        bbScore += BitboardHelper.GetNumberOfSetBits(tempBitboard ^ 0x3c7e3c7e4200  ) * 10;
+        bbScore += BitboardHelper.GetNumberOfSetBits(board.GetPieceBitboard((PieceType)3, true) ^ 0xff818181818181ff ) * -10;
+        bbScore += BitboardHelper.GetNumberOfSetBits(board.GetPieceBitboard((PieceType)3, true) ^ 0x3c7e3c7e4200  ) * 10;
         //Queen
-        tempBitboard = board.GetPieceBitboard((PieceType)5, true);
-        bbScore += BitboardHelper.GetNumberOfSetBits(tempBitboard ^ 0xf7818180008181e7  ) * -10;
-        bbScore += BitboardHelper.GetNumberOfSetBits(tempBitboard ^ 0x3c3c3c3e0400   ) * 5;
+        bbScore += BitboardHelper.GetNumberOfSetBits(board.GetPieceBitboard((PieceType)4, true) ^ 0xf7818180008181e7  ) * -10;
+        bbScore += BitboardHelper.GetNumberOfSetBits(board.GetPieceBitboard((PieceType)4, true) ^ 0x3c3c3c3e0400   ) * 5;
         //King
-        tempBitboard = board.GetPieceBitboard((PieceType)6, true);
-        bbScore += BitboardHelper.GetNumberOfSetBits(tempBitboard ^ 0x183c0000004266    ) * 5;
-        bbScore += BitboardHelper.GetNumberOfSetBits(tempBitboard ^ 0xe7c3c38181990000       ) * 5;
+        bbScore += BitboardHelper.GetNumberOfSetBits(board.GetPieceBitboard((PieceType)5, true) ^ 0x183c0000004266    ) * 5;
+        bbScore += BitboardHelper.GetNumberOfSetBits(board.GetPieceBitboard((PieceType)5, true) ^ 0xe7c3c38181990000       ) * 5;
 
         //Pawn
-        tempBitboard = board.GetPieceBitboard((PieceType)1, false);
-        bbScore -= BitboardHelper.GetNumberOfSetBits(tempBitboard ^ 0x18ff00 ) * 40;
-        bbScore -= BitboardHelper.GetNumberOfSetBits(tempBitboard ^ 0x1818240000  ) * 20;
-        bbScore -= BitboardHelper.GetNumberOfSetBits(tempBitboard ^ 0x66000066c30000  ) * 10;
-        bbScore -= BitboardHelper.GetNumberOfSetBits(tempBitboard ^ 0x18660000000000  ) * -10;
+        bbScore -= BitboardHelper.GetNumberOfSetBits(board.GetPieceBitboard((PieceType)1, false) ^ 0x18ff00 ) * 40;
+        bbScore -= BitboardHelper.GetNumberOfSetBits(board.GetPieceBitboard((PieceType)1, false) ^ 0x1818240000  ) * 20;
+        bbScore -= BitboardHelper.GetNumberOfSetBits(board.GetPieceBitboard((PieceType)1, false) ^ 0x66000066c30000  ) * 10;
+        bbScore -= BitboardHelper.GetNumberOfSetBits(board.GetPieceBitboard((PieceType)1, false) ^ 0x18660000000000  ) * -10;
         //Knight
-        tempBitboard = board.GetPieceBitboard((PieceType)2, false);
-        bbScore -= BitboardHelper.GetNumberOfSetBits(tempBitboard ^ 0xc3810000000081c3  ) * -40;
-        bbScore -= BitboardHelper.GetNumberOfSetBits(tempBitboard ^ 0x3c4281818181423c  ) * -20;
-        bbScore -= BitboardHelper.GetNumberOfSetBits(tempBitboard ^ 0x18660042240000  ) * 10;
-        bbScore -= BitboardHelper.GetNumberOfSetBits(tempBitboard ^ 0x183c3c180000  ) * 20;
+        bbScore -= BitboardHelper.GetNumberOfSetBits(board.GetPieceBitboard((PieceType)2, false) ^ 0xc3810000000081c3  ) * -40;
+        bbScore -= BitboardHelper.GetNumberOfSetBits(board.GetPieceBitboard((PieceType)2, false) ^ 0x3c4281818181423c  ) * -20;
+        bbScore -= BitboardHelper.GetNumberOfSetBits(board.GetPieceBitboard((PieceType)2, false) ^ 0x18660042240000  ) * 10;
+        bbScore -= BitboardHelper.GetNumberOfSetBits(board.GetPieceBitboard((PieceType)2, false) ^ 0x183c3c180000  ) * 20;
         //Bishop
-        tempBitboard = board.GetPieceBitboard((PieceType)3, false);
-        bbScore -= BitboardHelper.GetNumberOfSetBits(tempBitboard ^ 0xff818181818181ff  ) * -10;
-        bbScore -= BitboardHelper.GetNumberOfSetBits(tempBitboard ^ 0x427e3c7e3c0000   ) * 10;
+        bbScore -= BitboardHelper.GetNumberOfSetBits(board.GetPieceBitboard((PieceType)3, false) ^ 0xff818181818181ff  ) * -10;
+        bbScore -= BitboardHelper.GetNumberOfSetBits(board.GetPieceBitboard((PieceType)3, false) ^ 0x427e3c7e3c0000   ) * 10;
         //Queen
-        tempBitboard = board.GetPieceBitboard((PieceType)5, false);
-        bbScore -= BitboardHelper.GetNumberOfSetBits(tempBitboard ^ 0xe7818100018181ef  ) * -10;
-        bbScore -= BitboardHelper.GetNumberOfSetBits(tempBitboard ^ 0x207c3c3c3c0000    ) * 5;
+        bbScore -= BitboardHelper.GetNumberOfSetBits(board.GetPieceBitboard((PieceType)4, false) ^ 0xe7818100018181ef  ) * -10;
+        bbScore -= BitboardHelper.GetNumberOfSetBits(board.GetPieceBitboard((PieceType)4, false) ^ 0x207c3c3c3c0000    ) * 5;
         //King
-        tempBitboard = board.GetPieceBitboard((PieceType)6, false);
-        bbScore -= BitboardHelper.GetNumberOfSetBits(tempBitboard ^ 0x66420000003c1800     ) * 5;
-        bbScore -= BitboardHelper.GetNumberOfSetBits(tempBitboard ^ 0x998181c3c3e7) * 5;
+        bbScore -= BitboardHelper.GetNumberOfSetBits(board.GetPieceBitboard((PieceType)5, false) ^ 0x66420000003c1800     ) * 5;
+        bbScore -= BitboardHelper.GetNumberOfSetBits(board.GetPieceBitboard((PieceType)5, false) ^ 0x998181c3c3e7) * 5;
 
         boardWeight += board.IsWhiteToMove ? bbScore : -bbScore;
-
-        //ENDGAMES
-
-        if(board.GetPieceBitboard((PieceType)4, !board.IsWhiteToMove) == 0)
-        {
-            boardWeight += board.GetKingSquare(!board.IsWhiteToMove).Rank * 10 - 35;
-            boardWeight += board.GetKingSquare(!board.IsWhiteToMove).File * 10 - 35;
-        }
 
         //TODO
         //Increases weight if pawn is further up the board in the endgame
