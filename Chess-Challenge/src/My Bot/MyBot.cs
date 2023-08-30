@@ -17,12 +17,12 @@ public class MyBot : IChessBot
         //Default move to stop CS shitting itself
         Move bestMove = Move.NullMove;
 
-        int bestWeight = -100000;
+        int bestWeight = int.MinValue;
         //Run Minmax on each possible move to check which is best
         foreach (Move currentMove in board.GetLegalMoves())
         {
             board.MakeMove(currentMove);
-            int currentWeight = MinMax(board, 2, false);
+            int currentWeight = -MinMax(board, 2);
             board.UndoMove(currentMove);
             if (bestWeight < currentWeight) 
             {
@@ -32,37 +32,25 @@ public class MyBot : IChessBot
         }
         return bestMove;
     }
-    public int MinMax(Board board, int depth, bool maximizingPlayer) 
+    public int MinMax(Board board, int depth, int alpha, int beta) 
     {
         if (depth == 0)
-            {
-                return EvaluateBoard(board);
-            }
+        {
+            return -EvaluateBoard(board);
+        }
 
-            int bestWeight;
-            if (maximizingPlayer)
-            {
-                bestWeight = int.MinValue;
-                foreach (Move currentMove in board.GetLegalMoves())
-                {
-                    board.MakeMove(currentMove);
-                    int currentWeight = MinMax(board, depth - 1, false);
-                    board.UndoMove(currentMove);
-                    bestWeight = Math.Max(bestWeight, currentWeight);
-                }
-            }
-            else
-            {
-                bestWeight = int.MaxValue;
-                foreach (Move currentMove in board.GetLegalMoves())
-                {
-                    board.MakeMove(currentMove);
-                    int currentWeight = MinMax(board, depth - 1, true);
-                    board.UndoMove(currentMove);
-                    bestWeight = Math.Min(bestWeight, currentWeight);
-                }
-            }
-            return bestWeight;
+        int bestWeight = int.MinValue;
+
+        foreach (Move currentMove in board.GetLegalMoves())
+        {
+            board.MakeMove(currentMove);
+            int currentWeight = -MinMax(board, depth - 1);
+            board.UndoMove(currentMove);
+            bestWeight = Math.Max(bestWeight, currentWeight);
+            //alpha = Math.Max(currentWeight, alpha);
+            //if(currentWeight >= beta) return beta;
+        }
+        return bestWeight;
     }
 
     //TODO
@@ -99,7 +87,7 @@ public class MyBot : IChessBot
 
         //RAMP THIS UP
         //Currently poor trades being made
-        int[] pieceValue = {10,30,30,50,90,00};
+        int[] pieceValue = {75,225,225,375,675,000};
         int counter = 0;
         foreach (PieceList pieceList in board.GetAllPieceLists())
         {
