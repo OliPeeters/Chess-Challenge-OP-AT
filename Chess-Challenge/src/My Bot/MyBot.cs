@@ -32,7 +32,7 @@ public class MyBot : IChessBot
         }
         return bestMove;
     }
-    public int MinMax(Board board, int depth, int alpha, int beta) 
+    public int MinMax(Board board, int depth) 
     {
         if (depth == 0)
         {
